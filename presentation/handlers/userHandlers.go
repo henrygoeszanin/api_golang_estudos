@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
+
 	"github.com/gin-gonic/gin"
 	"github.com/henrygoeszanin/api_golang_estudos/application/dtos"
 	"github.com/henrygoeszanin/api_golang_estudos/application/interfaces/services"
@@ -127,4 +129,42 @@ func (h *UserHandler) PromoteToAdmin(c *gin.Context) {
 		"message": "Usuário promovido a administrador",
 		"user":    user,
 	})
+}
+
+func (h *UserHandler) GetMe(c *gin.Context) {
+	// Extrair claims JWT para obter o ID do usuário autenticado
+	claims := jwt.ExtractClaims(c)
+	userID := uint(claims["id"].(float64))
+
+	// Buscar o usuário no serviço
+	user, err := h.userService.GetByID(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+// UpdateMe atualiza o perfil do usuário logado
+func (h *UserHandler) UpdateMe(c *gin.Context) {
+	// Extrair claims JWT para obter o ID do usuário autenticado
+	claims := jwt.ExtractClaims(c)
+	userID := uint(claims["id"].(float64))
+
+	// Fazer o binding dos dados de atualização
+	var userDTO dtos.UserUpdateDTO
+	if err := c.ShouldBindJSON(&userDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Atualizar o usuário
+	updatedUser, err := h.userService.Update(userID, userDTO)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedUser)
 }

@@ -17,10 +17,12 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Inicializar repositórios
 	userRepository := repositories.NewUserRepository(db)
 	bookRepository := repositories.NewBookRepository(db)
+	loanRepository := repositories.NewLoanRepository(db)
 
 	// Inicializar serviços
 	userService := services.NewUserService(userRepository)
 	bookService := services.NewBookService(bookRepository)
+	loanService := services.NewLoanService(loanRepository, bookRepository)
 
 	// Configurar middleware JWT
 	authMiddleware, err := middlewares.SetupJWTMiddleware(userService, cfg)
@@ -31,6 +33,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Inicializar handlers
 	userHandler := handlers.NewUserHandler(userService)
 	bookHandler := handlers.NewBookHandler(bookService)
+	loanHandler := handlers.NewLoanHandler(loanService)
 
 	// Definir grupo base da API
 	api := router.Group("/api")
@@ -39,7 +42,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	setupHealthRoutes(api)
 	setupAuthRoutes(api, userHandler, authMiddleware)
 	setupBookRoutes(api, bookHandler, authMiddleware)
-	setupLoanRoutes(api, authMiddleware)
+	setupLoanRoutes(api, loanHandler, authMiddleware)
 	setupUserRoutes(api, userHandler, authMiddleware)
 }
 
@@ -83,26 +86,15 @@ func setupBookRoutes(router *gin.RouterGroup, bookHandler *handlers.BookHandler,
 }
 
 // setupLoanRoutes configura rotas relacionadas a empréstimos
-func setupLoanRoutes(router *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
+func setupLoanRoutes(router *gin.RouterGroup, loanHandler *handlers.LoanHandler, authMiddleware *jwt.GinJWTMiddleware) {
 	// Todas as rotas de empréstimos requerem autenticação
 	loans := router.Group("/loans")
 	loans.Use(authMiddleware.MiddlewareFunc())
 	{
-		loans.GET("/", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Listagem de empréstimos não implementada"})
-		})
-
-		loans.POST("/", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Criação de empréstimo não implementada"})
-		})
-
-		loans.GET("/:id", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Detalhes do empréstimo não implementados"})
-		})
-
-		loans.PUT("/:id/return", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Devolução de empréstimo não implementada"})
-		})
+		loans.GET("/", loanHandler.List)
+		loans.POST("/", loanHandler.Create)
+		loans.GET("/:id", loanHandler.GetByID)
+		loans.PUT("/:id/return", loanHandler.ReturnLoan)
 	}
 }
 
@@ -112,13 +104,8 @@ func setupUserRoutes(router *gin.RouterGroup, userHandler *handlers.UserHandler,
 	users := router.Group("/users")
 	users.Use(authMiddleware.MiddlewareFunc())
 	{
-		users.GET("/me", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Perfil do usuário não implementado"})
-		})
-
-		users.PUT("/me", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Atualização do perfil não implementada"})
-		})
+		users.GET("/me", userHandler.GetMe)
+		users.PUT("/me", userHandler.UpdateMe)
 	}
 
 	// Rotas administrativas para gerenciamento de usuários
