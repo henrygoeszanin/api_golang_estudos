@@ -1,0 +1,37 @@
+API de estudos: uma API de biblioteca que controla usuários, permite criação de contas com email e senha, 
+realiza autenticação, permite empréstimos de livros por períodos definidos pelos usuários,
+implementa CRUD completo de livros por usuários administradores autenticados, onde apenas administradores podem 
+promover outros usuários a administradores, sendo o primeiro usuário cadastrado automaticamente um administrador.
+
+Tecnologias utilizadas:
+- Framework web -> Gin
+- Banco de dados -> GORM - PostgreSQL
+  Comando docker: docker run --name postgres-library -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=library_api -p 5432:5432 -d postgres
+- Autenticação -> gin-jwt
+- Validação de dados -> Gin
+- Configuração -> godotenv
+
+
+Estrutura de diretórios:
+api_golang_estudos/
+├── application/
+│   ├── services/       # Lógica de negócios e casos de uso
+│   ├── dtos/           # Objetos de transferência de dados
+│   └── interfaces/     # Interfaces
+│       └── services/       # Interfaces de serviços
+│       └── repositories/   # Interfaces de repositórios
+├── config/
+│   └── env.go          # Configuração de ambiente
+├── domain/
+│   ├── entities/       # Entidades principais de negócio
+│   └── errors/         # Erros específicos do domínio
+├── infrastructure/
+│   ├── database/       # Implementação do PostgreSQL
+│   │   └── migrations/ # Migrações de esquema
+│   ├── auth/           # Implementação de autenticação
+│   └── repositories/   # Implementações de repositórios
+├── presentation/
+│   ├── handlers/       # Manipuladores HTTP
+│   ├── middlewares/    # Middlewares de autenticação
+│   └── routes/         # Definições de rotas
+└── main.go             # Ponto de entrada da aplicação
