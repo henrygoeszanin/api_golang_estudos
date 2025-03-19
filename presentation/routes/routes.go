@@ -16,9 +16,11 @@ import (
 func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Inicializar repositórios
 	userRepository := repositories.NewUserRepository(db)
+	bookRepository := repositories.NewBookRepository(db)
 
 	// Inicializar serviços
 	userService := services.NewUserService(userRepository)
+	bookService := services.NewBookService(bookRepository)
 
 	// Configurar middleware JWT
 	authMiddleware, err := middlewares.SetupJWTMiddleware(userService, cfg)
@@ -28,6 +30,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 	// Inicializar handlers
 	userHandler := handlers.NewUserHandler(userService)
+	bookHandler := handlers.NewBookHandler(bookService)
 
 	// Definir grupo base da API
 	api := router.Group("/api")
@@ -35,7 +38,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Configurar grupos de rotas por domínio
 	setupHealthRoutes(api)
 	setupAuthRoutes(api, userHandler, authMiddleware)
-	setupBookRoutes(api, authMiddleware)
+	setupBookRoutes(api, bookHandler, authMiddleware)
 	setupLoanRoutes(api, authMiddleware)
 	setupUserRoutes(api, userHandler, authMiddleware)
 }
@@ -61,34 +64,21 @@ func setupAuthRoutes(router *gin.RouterGroup, userHandler *handlers.UserHandler,
 }
 
 // setupBookRoutes configura rotas relacionadas a livros
-func setupBookRoutes(router *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
+func setupBookRoutes(router *gin.RouterGroup, bookHandler *handlers.BookHandler, authMiddleware *jwt.GinJWTMiddleware) {
 	// Rotas públicas (consulta)
 	books := router.Group("/books")
 	{
-		books.GET("/", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Listagem de livros não implementada"})
-		})
-
-		books.GET("/:id", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Detalhes do livro não implementados"})
-		})
+		books.GET("/", bookHandler.List)
+		books.GET("/:id", bookHandler.GetByID)
 	}
 
 	// Rotas administrativas (gerenciamento)
 	adminBooks := router.Group("/admin/books")
 	adminBooks.Use(authMiddleware.MiddlewareFunc(), middlewares.AdminRequired())
 	{
-		adminBooks.POST("/", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Adição de livro não implementada"})
-		})
-
-		adminBooks.PUT("/:id", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Atualização de livro não implementada"})
-		})
-
-		adminBooks.DELETE("/:id", func(c *gin.Context) {
-			c.JSON(501, gin.H{"message": "Remoção de livro não implementada"})
-		})
+		adminBooks.POST("/", bookHandler.Create)
+		adminBooks.PUT("/:id", bookHandler.Update)
+		adminBooks.DELETE("/:id", bookHandler.Delete)
 	}
 }
 
