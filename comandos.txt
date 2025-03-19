@@ -1,0 +1,93 @@
+GERENCIAMENTO DE MODULOS
+
+# Inicializar um novo módulo Go
+go mod init github.com/henrygoeszanin/api_golang_estudos
+
+# Adicionar dependências ausentes e remover não utilizadas
+go mod tidy
+
+# Baixar módulos explicitamente
+go get github.com/gin-gonic/gin
+
+# Baixar uma versão específica de um módulo
+go get github.com/gin-gonic/gin@v1.9.0
+
+# Atualizar todas as dependências
+go get -u ./...
+
+# Visualizar dependências do módulo
+go list -m all
+
+COMPILAÇÃO E EXECUÇÃO
+
+# Compilar e executar o programa
+go run main.go
+
+# Compilar o programa
+go build
+
+# Compilar e criar executável em pasta específica
+go build -o bin/api .
+
+# Instalar o programa (coloca o executável em $GOPATH/bin)
+go install
+
+TESTES
+
+# Executar todos os testes
+go test ./...
+
+# Executar testes com cobertura
+go test -cover ./...
+
+# Gerar relatório de cobertura
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+
+# Executar testes com detalhes
+go test -v ./...
+
+FORMATAÇÃO E LINTING
+
+# Formatar código
+go fmt ./...
+
+# Verificar erros
+go vet ./...
+
+# Instalar o linter golangci-lint
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+# Executar o linter
+golangci-lint run
+
+FERRAMENTAS DE DOCUMENTAÇÃO
+
+# Gerar documentação e servir localmente
+go doc -http=:6060
+
+# Verificar documentação de um pacote
+go doc github.com/gin-gonic/gin
+
+PARA ESSE PROJETO
+
+# Baixar todas as dependências do seu projeto
+cd d:\Dev\golang\api_golang_estudos
+go mod tidy
+
+# Executar o servidor
+go run main.go
+
+# Compilar o servidor para produção
+go build -o api_golang_estudos.exe
+
+# Executar testes
+go test ./...
+
+BANCO DE DADOS docker
+
+# Iniciar container PostgreSQL (conforme sua documentação)
+docker run --name postgres-library -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=library_api -p 5432:5432 -d postgres
+
+# Verificar se o container está rodando
+docker ps
