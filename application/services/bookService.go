@@ -22,7 +22,7 @@ func NewBookService(bookRepository repositories.BookRepository) services.BookSer
 }
 
 // Create cria um novo livro
-func (s *bookService) Create(bookDTO dtos.BookCreateDTO) (*dtos.BookResponseDTO, error) {
+func (bookservice *bookService) Create(bookDTO dtos.BookCreateDTO) (*dtos.BookResponseDTO, error) {
 	book := entities.Book{
 		Title:       bookDTO.Title,
 		Author:      bookDTO.Author,
@@ -31,7 +31,7 @@ func (s *bookService) Create(bookDTO dtos.BookCreateDTO) (*dtos.BookResponseDTO,
 		Available:   bookDTO.Quantity, // Inicialmente todos disponíveis
 	}
 
-	if err := s.bookRepository.Create(&book); err != nil {
+	if err := bookservice.bookRepository.Create(&book); err != nil {
 		return nil, err
 	}
 
@@ -40,8 +40,8 @@ func (s *bookService) Create(bookDTO dtos.BookCreateDTO) (*dtos.BookResponseDTO,
 }
 
 // GetByID busca um livro pelo ID
-func (s *bookService) GetByID(id uint) (*dtos.BookResponseDTO, error) {
-	book, err := s.bookRepository.FindByID(id)
+func (bookservice *bookService) GetByID(id uint) (*dtos.BookResponseDTO, error) {
+	book, err := bookservice.bookRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func (s *bookService) GetByID(id uint) (*dtos.BookResponseDTO, error) {
 }
 
 // List retorna todos os livros
-func (s *bookService) List() ([]dtos.BookResponseDTO, error) {
-	books, err := s.bookRepository.List()
+func (bookservice *bookService) List() ([]dtos.BookResponseDTO, error) {
+	books, err := bookservice.bookRepository.List()
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +69,8 @@ func (s *bookService) List() ([]dtos.BookResponseDTO, error) {
 }
 
 // Update atualiza os dados de um livro
-func (s *bookService) Update(id uint, bookDTO dtos.BookUpdateDTO) (*dtos.BookResponseDTO, error) {
-	book, err := s.bookRepository.FindByID(id)
+func (bookservice *bookService) Update(id uint, bookDTO dtos.BookUpdateDTO) (*dtos.BookResponseDTO, error) {
+	book, err := bookservice.bookRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s *bookService) Update(id uint, bookDTO dtos.BookUpdateDTO) (*dtos.BookRes
 		book.Quantity = bookDTO.Quantity
 	}
 
-	if err := s.bookRepository.Update(book); err != nil {
+	if err := bookservice.bookRepository.Update(book); err != nil {
 		return nil, err
 	}
 
@@ -107,6 +107,6 @@ func (s *bookService) Update(id uint, bookDTO dtos.BookUpdateDTO) (*dtos.BookRes
 }
 
 // Delete remove um livro
-func (s *bookService) Delete(id uint) error {
-	return s.bookRepository.Delete(id)
+func (bookservice *bookService) Delete(id uint) error {
+	return bookservice.bookRepository.Delete(id)
 }

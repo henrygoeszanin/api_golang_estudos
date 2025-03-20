@@ -21,9 +21,9 @@ func NewUserRepository(db *gorm.DB) repositories.UserRepository {
 }
 
 // Create cria um novo usuário no banco de dados
-func (r *userRepository) Create(user *entities.User) error {
+func (userRepository *userRepository) Create(user *entities.User) error {
 	// Verificar se é o primeiro usuário
-	isFirst, err := r.IsFirstUser()
+	isFirst, err := userRepository.IsFirstUser()
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (r *userRepository) Create(user *entities.User) error {
 		user.IsAdmin = true
 	}
 
-	result := r.db.Create(user)
+	result := userRepository.db.Create(user)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -41,9 +41,9 @@ func (r *userRepository) Create(user *entities.User) error {
 }
 
 // FindByID busca um usuário pelo seu ID
-func (r *userRepository) FindByID(id uint) (*entities.User, error) {
+func (userRepository *userRepository) FindByID(id uint) (*entities.User, error) {
 	var user entities.User
-	result := r.db.First(&user, id)
+	result := userRepository.db.First(&user, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // Usuário não encontrado
@@ -54,9 +54,9 @@ func (r *userRepository) FindByID(id uint) (*entities.User, error) {
 }
 
 // FindByEmail busca um usuário pelo seu email
-func (r *userRepository) FindByEmail(email string) (*entities.User, error) {
+func (userRepository *userRepository) FindByEmail(email string) (*entities.User, error) {
 	var user entities.User
-	result := r.db.Where("email = ?", email).First(&user)
+	result := userRepository.db.Where("email = ?", email).First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // Usuário não encontrado
@@ -67,14 +67,14 @@ func (r *userRepository) FindByEmail(email string) (*entities.User, error) {
 }
 
 // Update atualiza os dados de um usuário
-func (r *userRepository) Update(user *entities.User) error {
-	result := r.db.Save(user)
+func (userRepository *userRepository) Update(user *entities.User) error {
+	result := userRepository.db.Save(user)
 	return result.Error
 }
 
 // Delete remove um usuário pelo seu ID
-func (r *userRepository) Delete(id uint) error {
-	result := r.db.Delete(&entities.User{}, id)
+func (userRepository *userRepository) Delete(id uint) error {
+	result := userRepository.db.Delete(&entities.User{}, id)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -85,9 +85,9 @@ func (r *userRepository) Delete(id uint) error {
 }
 
 // List retorna todos os usuários
-func (r *userRepository) List() ([]*entities.User, error) {
+func (userRepository *userRepository) List() ([]*entities.User, error) {
 	var users []*entities.User
-	result := r.db.Find(&users)
+	result := userRepository.db.Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -95,8 +95,8 @@ func (r *userRepository) List() ([]*entities.User, error) {
 }
 
 // PromoteToAdmin promove um usuário para administrador
-func (r *userRepository) PromoteToAdmin(id uint) error {
-	result := r.db.Model(&entities.User{}).Where("id = ?", id).Update("is_admin", true)
+func (userRepository *userRepository) PromoteToAdmin(id uint) error {
+	result := userRepository.db.Model(&entities.User{}).Where("id = ?", id).Update("is_admin", true)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -107,9 +107,9 @@ func (r *userRepository) PromoteToAdmin(id uint) error {
 }
 
 // IsFirstUser verifica se este será o primeiro usuário no sistema
-func (r *userRepository) IsFirstUser() (bool, error) {
+func (userRepository *userRepository) IsFirstUser() (bool, error) {
 	var count int64
-	if err := r.db.Model(&entities.User{}).Count(&count).Error; err != nil {
+	if err := userRepository.db.Model(&entities.User{}).Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count == 0, nil

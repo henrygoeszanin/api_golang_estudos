@@ -22,8 +22,8 @@ func NewBookHandler(bookService services.BookService) *BookHandler {
 }
 
 // List lista todos os livros
-func (h *BookHandler) List(c *gin.Context) {
-	books, err := h.bookService.List()
+func (bookHandler *BookHandler) List(c *gin.Context) {
+	books, err := bookHandler.bookService.List()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -33,7 +33,7 @@ func (h *BookHandler) List(c *gin.Context) {
 }
 
 // GetByID busca um livro pelo ID
-func (h *BookHandler) GetByID(c *gin.Context) {
+func (bookHandler *BookHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
@@ -41,7 +41,7 @@ func (h *BookHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	book, err := h.bookService.GetByID(uint(id))
+	book, err := bookHandler.bookService.GetByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -51,14 +51,14 @@ func (h *BookHandler) GetByID(c *gin.Context) {
 }
 
 // Create adiciona um novo livro
-func (h *BookHandler) Create(c *gin.Context) {
+func (bookHandler *BookHandler) Create(c *gin.Context) {
 	var bookDTO dtos.BookCreateDTO
 	if err := c.ShouldBindJSON(&bookDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	createdBook, err := h.bookService.Create(bookDTO)
+	createdBook, err := bookHandler.bookService.Create(bookDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -68,7 +68,7 @@ func (h *BookHandler) Create(c *gin.Context) {
 }
 
 // Update atualiza os dados de um livro
-func (h *BookHandler) Update(c *gin.Context) {
+func (bookHandler *BookHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
@@ -82,7 +82,7 @@ func (h *BookHandler) Update(c *gin.Context) {
 		return
 	}
 
-	book, err := h.bookService.Update(uint(id), bookDTO)
+	book, err := bookHandler.bookService.Update(uint(id), bookDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -92,7 +92,7 @@ func (h *BookHandler) Update(c *gin.Context) {
 }
 
 // Delete remove um livro
-func (h *BookHandler) Delete(c *gin.Context) {
+func (bookHandler *BookHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
@@ -100,7 +100,7 @@ func (h *BookHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.bookService.Delete(uint(id)); err != nil {
+	if err := bookHandler.bookService.Delete(uint(id)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

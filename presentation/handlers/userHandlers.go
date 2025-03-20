@@ -24,14 +24,14 @@ func NewUserHandler(userService services.UserService) *UserHandler {
 }
 
 // Register registra um novo usuário
-func (h *UserHandler) Register(c *gin.Context) {
+func (userHandler *UserHandler) Register(c *gin.Context) {
 	var userDTO dtos.UserCreateDTO
 	if err := c.ShouldBindJSON(&userDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	createdUser, err := h.userService.Create(userDTO)
+	createdUser, err := userHandler.userService.Create(userDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -41,7 +41,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 }
 
 // GetByID busca um usuário pelo ID
-func (h *UserHandler) GetByID(c *gin.Context) {
+func (userHandler *UserHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
@@ -49,7 +49,7 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.GetByID(uint(id))
+	user, err := userHandler.userService.GetByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -59,7 +59,7 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 }
 
 // Update atualiza os dados de um usuário
-func (h *UserHandler) Update(c *gin.Context) {
+func (userHandler *UserHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
@@ -73,7 +73,7 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.Update(uint(id), userDTO)
+	user, err := userHandler.userService.Update(uint(id), userDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -83,7 +83,7 @@ func (h *UserHandler) Update(c *gin.Context) {
 }
 
 // Delete remove um usuário
-func (h *UserHandler) Delete(c *gin.Context) {
+func (userHandler *UserHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
@@ -91,7 +91,7 @@ func (h *UserHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.userService.Delete(uint(id)); err != nil {
+	if err := userHandler.userService.Delete(uint(id)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -100,8 +100,8 @@ func (h *UserHandler) Delete(c *gin.Context) {
 }
 
 // List lista todos os usuários
-func (h *UserHandler) List(c *gin.Context) {
-	users, err := h.userService.List()
+func (userHandler *UserHandler) List(c *gin.Context) {
+	users, err := userHandler.userService.List()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -111,7 +111,7 @@ func (h *UserHandler) List(c *gin.Context) {
 }
 
 // PromoteToAdmin promove um usuário para administrador
-func (h *UserHandler) PromoteToAdmin(c *gin.Context) {
+func (userHandler *UserHandler) PromoteToAdmin(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
@@ -119,7 +119,7 @@ func (h *UserHandler) PromoteToAdmin(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.PromoteToAdmin(uint(id))
+	user, err := userHandler.userService.PromoteToAdmin(uint(id))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -131,13 +131,13 @@ func (h *UserHandler) PromoteToAdmin(c *gin.Context) {
 	})
 }
 
-func (h *UserHandler) GetMe(c *gin.Context) {
+func (userHandler *UserHandler) GetMe(c *gin.Context) {
 	// Extrair claims JWT para obter o ID do usuário autenticado
 	claims := jwt.ExtractClaims(c)
 	userID := uint(claims["id"].(float64))
 
 	// Buscar o usuário no serviço
-	user, err := h.userService.GetByID(userID)
+	user, err := userHandler.userService.GetByID(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -147,7 +147,7 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 }
 
 // UpdateMe atualiza o perfil do usuário logado
-func (h *UserHandler) UpdateMe(c *gin.Context) {
+func (userHandler *UserHandler) UpdateMe(c *gin.Context) {
 	// Extrair claims JWT para obter o ID do usuário autenticado
 	claims := jwt.ExtractClaims(c)
 	userID := uint(claims["id"].(float64))
@@ -160,7 +160,7 @@ func (h *UserHandler) UpdateMe(c *gin.Context) {
 	}
 
 	// Atualizar o usuário
-	updatedUser, err := h.userService.Update(userID, userDTO)
+	updatedUser, err := userHandler.userService.Update(userID, userDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

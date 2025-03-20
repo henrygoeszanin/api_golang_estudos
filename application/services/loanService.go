@@ -25,9 +25,9 @@ func NewLoanService(loanRepository repositories.LoanRepository, bookRepository r
 }
 
 // Create cria um novo empréstimo
-func (s *loanService) Create(userID uint, loanDTO dtos.LoanCreateDTO) (*dtos.LoanResponseDTO, error) {
+func (loanService *loanService) Create(userID uint, loanDTO dtos.LoanCreateDTO) (*dtos.LoanResponseDTO, error) {
 	// Verificar se o livro existe
-	book, err := s.bookRepository.FindByID(loanDTO.BookID)
+	book, err := loanService.bookRepository.FindByID(loanDTO.BookID)
 	if err != nil {
 		return nil, err
 	}
@@ -49,12 +49,12 @@ func (s *loanService) Create(userID uint, loanDTO dtos.LoanCreateDTO) (*dtos.Loa
 		IsReturned: false,
 	}
 
-	if err := s.loanRepository.Create(&loan); err != nil {
+	if err := loanService.loanRepository.Create(&loan); err != nil {
 		return nil, err
 	}
 
 	// Carregar dados completos do empréstimo com livro e usuário
-	fullLoan, err := s.loanRepository.FindByID(loan.ID)
+	fullLoan, err := loanService.loanRepository.FindByID(loan.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +64,8 @@ func (s *loanService) Create(userID uint, loanDTO dtos.LoanCreateDTO) (*dtos.Loa
 }
 
 // GetByID busca um empréstimo pelo ID
-func (s *loanService) GetByID(id uint, userID uint) (*dtos.LoanResponseDTO, error) {
-	loan, err := s.loanRepository.FindByID(id)
+func (loanService *loanService) GetByID(id uint, userID uint) (*dtos.LoanResponseDTO, error) {
+	loan, err := loanService.loanRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +83,8 @@ func (s *loanService) GetByID(id uint, userID uint) (*dtos.LoanResponseDTO, erro
 }
 
 // ListByUser retorna todos os empréstimos de um usuário
-func (s *loanService) ListByUser(userID uint) ([]dtos.LoanResponseDTO, error) {
-	loans, err := s.loanRepository.FindByUserID(userID)
+func (loanService *loanService) ListByUser(userID uint) ([]dtos.LoanResponseDTO, error) {
+	loans, err := loanService.loanRepository.FindByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -98,9 +98,9 @@ func (s *loanService) ListByUser(userID uint) ([]dtos.LoanResponseDTO, error) {
 }
 
 // ReturnLoan marca um empréstimo como devolvido
-func (s *loanService) ReturnLoan(id uint, userID uint) (*dtos.LoanResponseDTO, error) {
+func (loanService *loanService) ReturnLoan(id uint, userID uint) (*dtos.LoanResponseDTO, error) {
 	// Verificar se o empréstimo existe e pertence ao usuário
-	loan, err := s.loanRepository.FindByID(id)
+	loan, err := loanService.loanRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -118,12 +118,12 @@ func (s *loanService) ReturnLoan(id uint, userID uint) (*dtos.LoanResponseDTO, e
 
 	// Processar devolução
 	returnDate := time.Now()
-	if err := s.loanRepository.ReturnLoan(id, returnDate); err != nil {
+	if err := loanService.loanRepository.ReturnLoan(id, returnDate); err != nil {
 		return nil, err
 	}
 
 	// Obter empréstimo atualizado
-	updatedLoan, err := s.loanRepository.FindByID(id)
+	updatedLoan, err := loanService.loanRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}

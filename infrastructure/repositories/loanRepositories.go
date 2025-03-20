@@ -22,10 +22,10 @@ func NewLoanRepository(db *gorm.DB) repositories.LoanRepository {
 }
 
 // Create cria um novo empréstimo no banco de dados
-func (r *loanRepository) Create(loan *entities.Loan) error {
+func (loanRepository *loanRepository) Create(loan *entities.Loan) error {
 	// Verificar se o livro está disponível
 	var book entities.Book
-	if err := r.db.First(&book, loan.BookID).Error; err != nil {
+	if err := loanRepository.db.First(&book, loan.BookID).Error; err != nil {
 		return err
 	}
 
@@ -34,7 +34,7 @@ func (r *loanRepository) Create(loan *entities.Loan) error {
 	}
 
 	// Iniciar transação
-	tx := r.db.Begin()
+	tx := loanRepository.db.Begin()
 
 	// Diminuir contador de disponíveis
 	if err := tx.Model(&book).Update("available", book.Available-1).Error; err != nil {
@@ -52,9 +52,9 @@ func (r *loanRepository) Create(loan *entities.Loan) error {
 }
 
 // FindByID busca um empréstimo pelo seu ID
-func (r *loanRepository) FindByID(id uint) (*entities.Loan, error) {
+func (loanRepository *loanRepository) FindByID(id uint) (*entities.Loan, error) {
 	var loan entities.Loan
-	result := r.db.Preload("Book").Preload("User").First(&loan, id)
+	result := loanRepository.db.Preload("Book").Preload("User").First(&loan, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // Empréstimo não encontrado
@@ -65,9 +65,9 @@ func (r *loanRepository) FindByID(id uint) (*entities.Loan, error) {
 }
 
 // FindByUserID busca todos os empréstimos de um usuário
-func (r *loanRepository) FindByUserID(userID uint) ([]*entities.Loan, error) {
+func (loanRepository *loanRepository) FindByUserID(userID uint) ([]*entities.Loan, error) {
 	var loans []*entities.Loan
-	result := r.db.Where("user_id = ?", userID).Preload("Book").Preload("User").Find(&loans)
+	result := loanRepository.db.Where("user_id = ?", userID).Preload("Book").Preload("User").Find(&loans)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -75,16 +75,16 @@ func (r *loanRepository) FindByUserID(userID uint) ([]*entities.Loan, error) {
 }
 
 // Update atualiza os dados de um empréstimo
-func (r *loanRepository) Update(loan *entities.Loan) error {
-	result := r.db.Save(loan)
+func (loanRepository *loanRepository) Update(loan *entities.Loan) error {
+	result := loanRepository.db.Save(loan)
 	return result.Error
 }
 
 // ReturnLoan marca um empréstimo como devolvido e atualiza o estoque do livro
-func (r *loanRepository) ReturnLoan(id uint, returnDate time.Time) error {
+func (loanRepository *loanRepository) ReturnLoan(id uint, returnDate time.Time) error {
 	// Obter o empréstimo
 	var loan entities.Loan
-	if err := r.db.First(&loan, id).Error; err != nil {
+	if err := loanRepository.db.First(&loan, id).Error; err != nil {
 		return err
 	}
 
@@ -93,7 +93,7 @@ func (r *loanRepository) ReturnLoan(id uint, returnDate time.Time) error {
 	}
 
 	// Iniciar transação
-	tx := r.db.Begin()
+	tx := loanRepository.db.Begin()
 
 	// Atualizar empréstimo
 	if err := tx.Model(&loan).Updates(map[string]interface{}{

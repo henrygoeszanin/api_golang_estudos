@@ -11,14 +11,14 @@ import (
 )
 
 // SetupDatabase configura a conexão com o banco de dados PostgreSQL
-func SetupDatabase(cfg *config.Config) (*gorm.DB, error) {
+func SetupDatabase(config *config.Config) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Sao_Paulo",
-		cfg.DBHost,
-		cfg.DBUser,
-		cfg.DBPassword,
-		cfg.DBName,
-		cfg.DBPort,
+		config.DBHost,
+		config.DBUser,
+		config.DBPassword,
+		config.DBName,
+		config.DBPort,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

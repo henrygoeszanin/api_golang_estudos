@@ -28,7 +28,6 @@ api_golang_estudos/
 ├── infrastructure/
 │   ├── database/       # Implementação do PostgreSQL
 │   │   └── migrations/ # Migrações de esquema
-│   ├── auth/           # Implementação de autenticação
 │   └── repositories/   # Implementações de repositórios
 ├── presentation/
 │   ├── handlers/       # Manipuladores HTTP

@@ -21,18 +21,18 @@ func NewBookRepository(db *gorm.DB) repositories.BookRepository {
 }
 
 // Create cria um novo livro no banco de dados
-func (r *bookRepository) Create(book *entities.Book) error {
+func (bookRepository *bookRepository) Create(book *entities.Book) error {
 	// Garantir que disponível = quantidade inicialmente
 	book.Available = book.Quantity
 
-	result := r.db.Create(book)
+	result := bookRepository.db.Create(book)
 	return result.Error
 }
 
 // FindByID busca um livro pelo seu ID
-func (r *bookRepository) FindByID(id uint) (*entities.Book, error) {
+func (bookRepository *bookRepository) FindByID(id uint) (*entities.Book, error) {
 	var book entities.Book
-	result := r.db.First(&book, id)
+	result := bookRepository.db.First(&book, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // Livro não encontrado
@@ -43,9 +43,9 @@ func (r *bookRepository) FindByID(id uint) (*entities.Book, error) {
 }
 
 // List retorna todos os livros
-func (r *bookRepository) List() ([]*entities.Book, error) {
+func (bookRepository *bookRepository) List() ([]*entities.Book, error) {
 	var books []*entities.Book
-	result := r.db.Find(&books)
+	result := bookRepository.db.Find(&books)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -53,14 +53,14 @@ func (r *bookRepository) List() ([]*entities.Book, error) {
 }
 
 // Update atualiza os dados de um livro
-func (r *bookRepository) Update(book *entities.Book) error {
-	result := r.db.Save(book)
+func (bookRepository *bookRepository) Update(book *entities.Book) error {
+	result := bookRepository.db.Save(book)
 	return result.Error
 }
 
 // Delete remove um livro pelo seu ID
-func (r *bookRepository) Delete(id uint) error {
-	result := r.db.Delete(&entities.Book{}, id)
+func (bookRepository *bookRepository) Delete(id uint) error {
+	result := bookRepository.db.Delete(&entities.Book{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

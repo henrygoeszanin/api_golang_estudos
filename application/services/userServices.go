@@ -23,9 +23,9 @@ func NewUserService(userRepository repositories.UserRepository) services.UserSer
 }
 
 // Create cria um novo usuário
-func (s *userService) Create(userDTO dtos.UserCreateDTO) (*dtos.UserResponseDTO, error) {
+func (userService *userService) Create(userDTO dtos.UserCreateDTO) (*dtos.UserResponseDTO, error) {
 	// Verificar se o email já está em uso
-	existingUser, err := s.userRepository.FindByEmail(userDTO.Email)
+	existingUser, err := userService.userRepository.FindByEmail(userDTO.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (s *userService) Create(userDTO dtos.UserCreateDTO) (*dtos.UserResponseDTO,
 	}
 
 	// Salvar no banco de dados
-	if err := s.userRepository.Create(&user); err != nil {
+	if err := userService.userRepository.Create(&user); err != nil {
 		return nil, err
 	}
 
@@ -58,8 +58,8 @@ func (s *userService) Create(userDTO dtos.UserCreateDTO) (*dtos.UserResponseDTO,
 }
 
 // GetByID busca um usuário pelo ID
-func (s *userService) GetByID(id uint) (*dtos.UserResponseDTO, error) {
-	user, err := s.userRepository.FindByID(id)
+func (userService *userService) GetByID(id uint) (*dtos.UserResponseDTO, error) {
+	user, err := userService.userRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -72,13 +72,13 @@ func (s *userService) GetByID(id uint) (*dtos.UserResponseDTO, error) {
 }
 
 // GetByEmail busca um usuário pelo email
-func (s *userService) GetByEmail(email string) (*entities.User, error) {
-	return s.userRepository.FindByEmail(email)
+func (userService *userService) GetByEmail(email string) (*entities.User, error) {
+	return userService.userRepository.FindByEmail(email)
 }
 
 // Update atualiza os dados de um usuário
-func (s *userService) Update(id uint, userDTO dtos.UserUpdateDTO) (*dtos.UserResponseDTO, error) {
-	user, err := s.userRepository.FindByID(id)
+func (userService *userService) Update(id uint, userDTO dtos.UserUpdateDTO) (*dtos.UserResponseDTO, error) {
+	user, err := userService.userRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *userService) Update(id uint, userDTO dtos.UserUpdateDTO) (*dtos.UserRes
 	}
 
 	// Salvar alterações
-	if err := s.userRepository.Update(user); err != nil {
+	if err := userService.userRepository.Update(user); err != nil {
 		return nil, err
 	}
 
@@ -108,13 +108,13 @@ func (s *userService) Update(id uint, userDTO dtos.UserUpdateDTO) (*dtos.UserRes
 }
 
 // Delete remove um usuário
-func (s *userService) Delete(id uint) error {
-	return s.userRepository.Delete(id)
+func (userService *userService) Delete(id uint) error {
+	return userService.userRepository.Delete(id)
 }
 
 // List retorna todos os usuários
-func (s *userService) List() ([]dtos.UserResponseDTO, error) {
-	users, err := s.userRepository.List()
+func (userService *userService) List() ([]dtos.UserResponseDTO, error) {
+	users, err := userService.userRepository.List()
 	if err != nil {
 		return nil, err
 	}
@@ -128,12 +128,12 @@ func (s *userService) List() ([]dtos.UserResponseDTO, error) {
 }
 
 // PromoteToAdmin promove um usuário para administrador
-func (s *userService) PromoteToAdmin(id uint) (*dtos.UserResponseDTO, error) {
-	if err := s.userRepository.PromoteToAdmin(id); err != nil {
+func (userService *userService) PromoteToAdmin(id uint) (*dtos.UserResponseDTO, error) {
+	if err := userService.userRepository.PromoteToAdmin(id); err != nil {
 		return nil, err
 	}
 
-	user, err := s.userRepository.FindByID(id)
+	user, err := userService.userRepository.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -146,8 +146,8 @@ func (s *userService) PromoteToAdmin(id uint) (*dtos.UserResponseDTO, error) {
 }
 
 // AuthenticateUser autentica um usuário pelo email e senha
-func (s *userService) AuthenticateUser(email, password string) (*entities.User, error) {
-	user, err := s.userRepository.FindByEmail(email)
+func (userService *userService) AuthenticateUser(email, password string) (*entities.User, error) {
+	user, err := userService.userRepository.FindByEmail(email)
 	if err != nil {
 		return nil, err
 	}

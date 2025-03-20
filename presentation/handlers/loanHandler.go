@@ -23,12 +23,12 @@ func NewLoanHandler(loanService services.LoanService) *LoanHandler {
 }
 
 // List lista todos os empréstimos do usuário atual
-func (h *LoanHandler) List(c *gin.Context) {
+func (loalHandler *LoanHandler) List(c *gin.Context) {
 	// Obter ID do usuário das claims do JWT
 	claims := jwt.ExtractClaims(c)
 	userID := uint(claims["id"].(float64))
 
-	loans, err := h.loanService.ListByUser(userID)
+	loans, err := loalHandler.loanService.ListByUser(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -38,7 +38,7 @@ func (h *LoanHandler) List(c *gin.Context) {
 }
 
 // Create manipula a criação de um novo empréstimo
-func (h *LoanHandler) Create(c *gin.Context) {
+func (loalHandler *LoanHandler) Create(c *gin.Context) {
 	// Obter ID do usuário das claims do JWT
 	claims := jwt.ExtractClaims(c)
 	userID := uint(claims["id"].(float64))
@@ -50,7 +50,7 @@ func (h *LoanHandler) Create(c *gin.Context) {
 		return
 	}
 
-	loan, err := h.loanService.Create(userID, loanDTO)
+	loan, err := loalHandler.loanService.Create(userID, loanDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -60,7 +60,7 @@ func (h *LoanHandler) Create(c *gin.Context) {
 }
 
 // GetByID obtém detalhes de um empréstimo específico
-func (h *LoanHandler) GetByID(c *gin.Context) {
+func (loalHandler *LoanHandler) GetByID(c *gin.Context) {
 	// Obter ID do usuário das claims do JWT
 	claims := jwt.ExtractClaims(c)
 	userID := uint(claims["id"].(float64))
@@ -73,7 +73,7 @@ func (h *LoanHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	loan, err := h.loanService.GetByID(uint(id), userID)
+	loan, err := loalHandler.loanService.GetByID(uint(id), userID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -83,7 +83,7 @@ func (h *LoanHandler) GetByID(c *gin.Context) {
 }
 
 // ReturnLoan marca um empréstimo como devolvido
-func (h *LoanHandler) ReturnLoan(c *gin.Context) {
+func (loalHandler *LoanHandler) ReturnLoan(c *gin.Context) {
 	// Obter ID do usuário das claims do JWT
 	claims := jwt.ExtractClaims(c)
 	userID := uint(claims["id"].(float64))
@@ -96,7 +96,7 @@ func (h *LoanHandler) ReturnLoan(c *gin.Context) {
 		return
 	}
 
-	loan, err := h.loanService.ReturnLoan(uint(id), userID)
+	loan, err := loalHandler.loanService.ReturnLoan(uint(id), userID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
