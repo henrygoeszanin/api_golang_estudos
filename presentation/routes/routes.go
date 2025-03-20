@@ -77,7 +77,7 @@ func setupBookRoutes(router *gin.RouterGroup, bookHandler *handlers.BookHandler,
 
 	// Rotas administrativas (gerenciamento)
 	adminBooks := router.Group("/admin/books")
-	adminBooks.Use(authMiddleware.MiddlewareFunc(), middlewares.AdminRequired())
+	adminBooks.Use(middlewares.TokenExtractor(), authMiddleware.MiddlewareFunc(), middlewares.AdminRequired())
 	{
 		adminBooks.POST("/", bookHandler.Create)
 		adminBooks.PUT("/:id", bookHandler.Update)
@@ -89,7 +89,7 @@ func setupBookRoutes(router *gin.RouterGroup, bookHandler *handlers.BookHandler,
 func setupLoanRoutes(router *gin.RouterGroup, loanHandler *handlers.LoanHandler, authMiddleware *jwt.GinJWTMiddleware) {
 	// Todas as rotas de empréstimos requerem autenticação
 	loans := router.Group("/loans")
-	loans.Use(authMiddleware.MiddlewareFunc())
+	loans.Use(middlewares.TokenExtractor(), authMiddleware.MiddlewareFunc())
 	{
 		loans.GET("/", loanHandler.List)
 		loans.POST("/", loanHandler.Create)
@@ -102,7 +102,7 @@ func setupLoanRoutes(router *gin.RouterGroup, loanHandler *handlers.LoanHandler,
 func setupUserRoutes(router *gin.RouterGroup, userHandler *handlers.UserHandler, authMiddleware *jwt.GinJWTMiddleware) {
 	// Rotas de usuário que precisam de autenticação
 	users := router.Group("/users")
-	users.Use(authMiddleware.MiddlewareFunc())
+	users.Use(middlewares.TokenExtractor(), authMiddleware.MiddlewareFunc())
 	{
 		users.GET("/me", userHandler.GetMe)
 		users.PUT("/me", userHandler.UpdateMe)
@@ -110,7 +110,7 @@ func setupUserRoutes(router *gin.RouterGroup, userHandler *handlers.UserHandler,
 
 	// Rotas administrativas para gerenciamento de usuários
 	adminUsers := router.Group("/admin/users")
-	adminUsers.Use(authMiddleware.MiddlewareFunc(), middlewares.AdminRequired())
+	adminUsers.Use(middlewares.TokenExtractor(), authMiddleware.MiddlewareFunc(), middlewares.AdminRequired())
 	{
 		adminUsers.GET("/", userHandler.List)
 		adminUsers.GET("/:id", userHandler.GetByID)

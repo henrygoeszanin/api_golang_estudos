@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -134,7 +135,28 @@ func (userHandler *UserHandler) PromoteToAdmin(c *gin.Context) {
 func (userHandler *UserHandler) GetMe(c *gin.Context) {
 	// Extrair claims JWT para obter o ID do usuário autenticado
 	claims := jwt.ExtractClaims(c)
-	userID := uint(claims["id"].(float64))
+	// Verificar se o claim id existe
+	idVal, exists := claims["id"]
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":            "Token inválido: ID do usuário não encontrado",
+			"details":          "O token não contém a identificação do usuário",
+			"available_claims": claims,
+		})
+		return
+	}
+
+	// Conversão segura de tipos
+	var userID uint
+	if idFloat, ok := idVal.(float64); ok {
+		userID = uint(idFloat)
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Token inválido: formato de ID incorreto",
+			"details": fmt.Sprintf("Esperava um número, recebeu %T", idVal),
+		})
+		return
+	}
 
 	// Buscar o usuário no serviço
 	user, err := userHandler.userService.GetByID(userID)
